@@ -37,29 +37,28 @@ const products = [
  */
 function addProductToCart(product, quantity) {
   const cartTableBodyElement = document.querySelector('.cart table tbody');
+  // gera id á nýja product að streng
   const idStrengur = product.id.toString();
   if (cartTableBodyElement) {
+    // leitar að því hvort að það sé nú þegar lína með sama id
     const sameID = cartTableBodyElement.querySelector('tr[data-product-id="'+ idStrengur + '"]');
     if (sameID) {
+      // sækja ID gildið
       const productId = sameID.getAttribute('data-product-id');
+      // foo er fjöldi gömlu vörunar
       const foo = sameID.querySelector('td.foo');
       // @ts-ignore
       var fjoldi = Number.parseInt(foo?.textContent);
-      console.log("Þetta er samtalið", fjoldi)
       // @ts-ignore
       if(productId.toString() === idStrengur){
         quantity += fjoldi;
         // @ts-ignore
+        // eyðir gömlu línunni
         sameID.parentElement.removeChild(sameID)
-        console.log("Þetta virkar");
       }
     }
   }
 
-  //console.log("Id á cartproduct", cartTableBodyElement?.querySelector('data-product-id'));
-  //console.log("prump", prump);
-  
-  
   if (!cartTableBodyElement) {
     console.warn('fann ekki .cart table');
     return;
@@ -70,11 +69,8 @@ function addProductToCart(product, quantity) {
   cartTableBodyElement.appendChild(cartLine);
 
   // Sýna efni körfu
-  /*if(cartTableBodyElement.childElementCount === 0){
-    showCartContent(false);
-  }
-  else{*/
-    showCartContent(true);
+
+  showCartContent(true);
   
   
 
@@ -112,9 +108,6 @@ function submitHandler(event) {
   }
 
   // Bætum vöru í körfu (hér væri gott að bæta við athugun á því að varan sé til)
-  /*if(parent.find((i) => i.product.id === productId)){
-    console.log("Já það eru tveir alveg eins hlutir");
-  }*/
   
   addProductToCart(product, quantity);
   
