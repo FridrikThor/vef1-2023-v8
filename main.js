@@ -1,5 +1,13 @@
 import { createCartLine, showCartContent } from './lib/ui.js';
 
+/**
+ * @typedef {Object} Product
+ * @property {number} id Auðkenni vöru, jákvæð heiltala stærri en 0.
+ * @property {string} title Titill vöru, ekki tómur strengur.
+ * @property {string} description Lýsing á vöru, ekki tómur strengur.
+ * @property {number} price Verð á vöru, jákvæð heiltala stærri en 0.
+ */
+
 const products = [
   {
     id: 1,
@@ -22,45 +30,94 @@ const products = [
   },
 ];
 
-/** Bæta vöru í körfu */
+/**
+ * Bæta vöru í körfu
+ * @param  {Product} product
+ * @param {number} quantity 
+ */
 function addProductToCart(product, quantity) {
-  // Hér þarf að finna `<tbody>` í töflu og setja `cartLine` inn í það
-  const cart = document.querySelector('.cart-content');
+  const cartTableBodyElement = document.querySelector('.cart table tbody');
+  const idStrengur = product.id.toString();
+  if (cartTableBodyElement) {
+    const sameID = cartTableBodyElement.querySelector('tr[data-product-id="'+ idStrengur + '"]');
+    if (sameID) {
+      const productId = sameID.getAttribute('data-product-id');
+      const foo = sameID.querySelector('td.foo');
+      // @ts-ignore
+      var fjoldi = Number.parseInt(foo?.textContent);
+      console.log("Þetta er samtalið", fjoldi)
+      // @ts-ignore
+      if(productId.toString() === idStrengur){
+        quantity += fjoldi;
+        // @ts-ignore
+        sameID.parentElement.removeChild(sameID)
+        console.log("Þetta virkar");
+      }
+    }
+  }
 
-  if (!cart) {
-    console.warn('fann ekki .cart');
+  //console.log("Id á cartproduct", cartTableBodyElement?.querySelector('data-product-id'));
+  //console.log("prump", prump);
+  
+  
+  if (!cartTableBodyElement) {
+    console.warn('fann ekki .cart table');
     return;
   }
   
   // TODO hér þarf að athuga hvort lína fyrir vöruna sé þegar til
   const cartLine = createCartLine(product, quantity);
-  cart.appendChild(cartLine);
+  cartTableBodyElement.appendChild(cartLine);
 
   // Sýna efni körfu
-  showCartContent(true);
+  /*if(cartTableBodyElement.childElementCount === 0){
+    showCartContent(false);
+  }
+  else{*/
+    showCartContent(true);
+  
+  
 
   // TODO sýna/uppfæra samtölu körfu
 }
 
 function submitHandler(event) {
   // Komum í veg fyrir að form submiti
+
   event.preventDefault();
   
   // Finnum næsta element sem er `<tr>`
-  const parent = event.target.closest('tr')
+  const parent = event.target.closest('tr');
+  
 
   // Það er með attribute sem tiltekur auðkenni vöru, t.d. `data-product-id="1"`
   const productId = Number.parseInt(parent.dataset.productId);
+  //console.log(productId);
 
   // Finnum vöru með þessu productId
   const product = products.find((i) => i.id === productId);
 
+
+  if (!product) {
+    return;
+  }
+
   // TODO hér þarf að finna fjölda sem á að bæta við körfu með því að athuga
   // á input
-  const quantity = 1;
+  const quantity = parseInt(event.target[0].value);
+  //const quantity = 1
+
+  if(!quantity){
+    return;
+  }
 
   // Bætum vöru í körfu (hér væri gott að bæta við athugun á því að varan sé til)
+  /*if(parent.find((i) => i.product.id === productId)){
+    console.log("Já það eru tveir alveg eins hlutir");
+  }*/
+  
   addProductToCart(product, quantity);
+  
 }
 
 // Finna öll form með class="add"
